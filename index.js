@@ -22,6 +22,9 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
+// include auth controller
+app.use('/auth', require('./controllers/auth'))
+
 // initialize app on port
 let port = process.env.PORT || 3000;
 app.listen(port, () => {console.log(`listening on port ${port}`) });
