@@ -35,7 +35,7 @@ router.post('/register', (req, res) =>{
       // sned redirect back to register GET route
   }).catch( error => {
     console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n', error, '\n', error.message);
-    req.flash(' error', error.message);
+    req.flash(' error', ` internal server error: \n${error.message}`);
     res.redirect('/auth/register');
   })
 });
