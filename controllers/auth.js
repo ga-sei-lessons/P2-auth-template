@@ -4,7 +4,7 @@ const db = require('../models');
 // import middleware
 const flash = require('flash');
 //TODO: update require below to passport conig file
-const passport;
+const passport = require("passport");
 
 // register GET route
 router.get('/register', (req, res) => {
@@ -57,7 +57,7 @@ router.post('/login', (req, res, next) => {
         return res.redirect('/auth/login');
       });
     }
-    
+
     if (error) {
       return next(error);
     }
