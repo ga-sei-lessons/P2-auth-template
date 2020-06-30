@@ -7,6 +7,7 @@ const session = require('express-session');
 const flash = require('flash');
 const passport = require('./config/ppConfig');
 const db = require('./models');
+const isLoggedIn = require('./middleware/isLoggedIn');
 // want to add link to custom middleware
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
@@ -42,7 +43,7 @@ app.use(flash());
 app.use(function(req, res, next){
   res.locals.alert = req.flash();
   res.locals.currentUser = req.user;
-  
+
   next();
 });
 
@@ -50,6 +51,10 @@ app.use(function(req, res, next){
 app.get('/', (req, res) => {
   //check is user is logged in
   res.render('index');
+});
+
+app.get('/profile', isLoggedIn, function(req, res){
+  res.render('profile');
 });
 
 // include auth controller
