@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../models');
 // import middleware
 const flash = require('flash');
+//TODO: update require below to passport conig file
+const passport;
 
 // register GET route
 router.get('/register', (req, res) => {
@@ -44,7 +46,41 @@ router.post('/register', (req, res) =>{
 router.get('/login', (req, res) =>{
   res.render('auth/login');
 });
+
 // login POST route
+router.post('/login', (req, res, next) => {
+  passport.authenticate('local', function(error, user, info){
+    // if no user authenticated
+    if(!user) {
+      req.flash('error', 'Invalid username or password');
+      req.session.save( function(){
+        return res.redirect('/auth/login');
+      });
+    }
+    
+    if (error) {
+      return next(error);
+    }
+
+    req.login( function(user, error) {
+      // if error, move to error
+      if (error) next(error); 
+      // if succes flash succuss message
+      req.flash('suceess', 'You are validated and logged in.')
+      // if success save session annd redirect
+      req.sessions.save(function(){
+        return res.redirect('/');
+      });   
+    });
+  });
+});
+
+router.post('/login', passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/auth/login',
+  successFlash: 'welcome to our app',
+  failureFlash: 'Invalid username and/or password'
+}));
 
 
 //export router

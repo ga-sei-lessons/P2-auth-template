@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // include auth controller
-app.use('/auth', require('./controllers/auth'))
+app.use('/auth', require('./controllers/auth'));
 
 // initialize app on port
 let port = process.env.PORT || 3000;
