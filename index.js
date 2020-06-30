@@ -42,7 +42,7 @@ app.use(flash());
 app.use(function(req, res, next){
   res.locals.alert = req.flash();
   res.locals.currentUser = req.user;
-
+  
   next();
 });
 
