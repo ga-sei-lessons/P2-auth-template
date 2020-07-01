@@ -3,90 +3,90 @@ const router = express.Router();
 const db = require('../models');
 // import middleware
 const flash = require('flash');
-//TODO: update require below to passport conig file
-const passport = require('../config/ppConfig');
+const passport = require("../config/ppConfig");
 
-// register GET route
-router.get('/register', (req, res) => {
+// register get route
+router.get('/register', function(req, res) {
   res.render('auth/register');
-});
-
-// register POST route
-router.post('/register', (req, res) =>{
+})
+// register post route
+router.post('/register', function(req, res) {
   db.user.findOrCreate({
     where: {
       email: req.body.email
-    }, 
-    defualts: {
+    }, defaults: {
       name: req.body.name,
       password: req.body.password
     }
-  }).then( ([user, created]) => {
+  }).then(function([user, created]) {
     // if user was created
-    if(created){
-      // authenticate user and start authorization process
-      console.log(`user created! 🎉`);
-      res.redirect('/');
+    if (created) {
+      console.log("User created! 🎉");
+      passport.authenticate('local', {
+        successRedirect: '/profile',
+        successFlash: 'Thanks for signing up!'
+      })(req, res);
     } else {
-      console.log('user email already exists 🛑');
-      req.flash('error', 'Error: email already exists for user');
+      console.log("User email already exists 🛑.");
+      req.flash('error', 'Error: email already exists for user. Try again.');
       res.redirect('/auth/register');
     }
-    // else if use already exists
-      // send error that user already exsists
-      // sned redirect back to register GET route
-  }).catch( error => {
-    console.log('🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥\n', error, '\n', error.message);
-    req.flash(' error', ` internal server error: \n${error.message}`);
+  }).catch(function(err) {
+    console.log(`Error found. \nMessage: ${err.message}. \nPlease review - ${err}`);
+    req.flash('error', err.message);
     res.redirect('/auth/register');
   })
-});
+})
 
-// login GET route
-router.get('/login', (req, res) =>{
+
+// login get route
+router.get('/login', function(req, res) {
   res.render('auth/login');
 });
 
-// login POST route
-router.post('/login', (req, res, next) => {
-  passport.authenticate('local', function(error, user, info){
+// login post route
+router.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(error, user, info) {
     // if no user authenticated
-    if(!user) {
-      req.flash('error', 'Invalid username or password');
-      req.session.save( function(){
-        return res.redirect('/auth/login');
-      });
-    }
-
+    // if (!user) {
+    //   req.flash('error', 'Invalid username or password');
+    //   req.session.save(function() {
+        
+    //     return res.redirect('/auth/login');
+    //   });
+    // }
+    if (!user) {
+      req.flash('incorrect id/password');
+      return res.redirect('/auth/login');
+  }
     if (error) {
       return next(error);
     }
 
-    req.login( function(user, error) {
-      // if error, move to error
-      if (error) next(error); 
-      // if succes flash succuss message
-      req.flash('suceess', 'You are validated and logged in.')
-      // if success save session annd redirect
-      req.sessions.save(function(){
-        return res.redirect('/');
-      });   
-    });
-  });
-});
+    req.login(user, function(error) {
+      // if error move to error
+      if (error) next(error);
+      // if success flash success message
+      req.flash('success', 'You are validated and logged in.');
+      // if success save session and redirect user
+      req.session.save(function() {
+        return res.redirect('/profile');
+      });
+    })
+  })(req, res, next);
+})
 
 router.post('/login', passport.authenticate('local', {
   successRedirect: '/',
   failureRedirect: '/auth/login',
-  successFlash: 'welcome to our app',
-  failureFlash: 'Invalid username and/or password'
+  successFlash: 'Welcome to our app!',
+  failureFlash: 'Invalid username or password.'
 }));
 
-
-router.get('/logout', function(req, res){
+router.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
-})
+});
 
-//export router
+// export router
 module.exports = router;

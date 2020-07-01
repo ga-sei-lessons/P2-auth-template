@@ -7,6 +7,7 @@ const db = require('../models');
 
 // serialize user
 passport.serializeUser( function(user, callback) {
+  console.log(`user: ${user}`)
   callback(null, user.id);
 });
 
