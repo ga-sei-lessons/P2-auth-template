@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models');
 // import middleware
-const flash = require('flash');
-const passport = require("../config/ppConfig");
+const flash = require('connect-flash');
+const passport = require('../config/ppConfig');
 
 // register get route
 router.get('/register', function(req, res) {
@@ -21,13 +21,13 @@ router.post('/register', function(req, res) {
   }).then(function([user, created]) {
     // if user was created
     if (created) {
-      console.log("User created! 🎉");
+      console.log('User created! 🎉');
       passport.authenticate('local', {
         successRedirect: '/profile',
         successFlash: 'Thanks for signing up!'
       })(req, res);
     } else {
-      console.log("User email already exists 🛑.");
+      console.log('User email already exists 🛑.');
       req.flash('error', 'Error: email already exists for user. Try again.');
       res.redirect('/auth/register');
     }
@@ -56,7 +56,7 @@ router.post('/login', function(req, res, next) {
     //   });
     // }
     if (!user) {
-      req.flash('incorrect id/password');
+      req.flash('error', 'incorrect id/password');
       return res.redirect('/auth/login');
   }
     if (error) {
@@ -76,12 +76,12 @@ router.post('/login', function(req, res, next) {
   })(req, res, next);
 })
 
-router.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/auth/login',
-  successFlash: 'Welcome to our app!',
-  failureFlash: 'Invalid username or password.'
-}));
+// router.post('/login', passport.authenticate('local', {
+//   successRedirect: '/',
+//   failureRedirect: '/auth/login',
+//   successFlash: 'Welcome to our app!',
+//   failureFlash: 'Invalid username or password.'
+// }));
 
 router.get('/logout', function(req, res) {
   req.logout();
